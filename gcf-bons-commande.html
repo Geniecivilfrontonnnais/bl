@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GCF – Bons de Commande</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: #F5F2ED; font-family: 'DM Sans', sans-serif; color: #1C1917; }
+input, select, textarea { font-family: 'DM Sans', sans-serif; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #C8400A !important; box-shadow: 0 0 0 3px #F5E8E2; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+const STORE = "gcf_react_v1";
+
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbzuXBYBJooMwE0Xw3cJUE0wSPRUXg8gIj3jZ_7ShB_rY2E61FGk1ezEaHJICcObZReJbQ/exec";
+
+function defaultDB() {
+  const aff=["000|STOCK","001|FRAIS GENERAUX","002|INVESTISSEMENT","003|ONDES","004|L'ISLES JOURDAIN","005|PALAYRE","006|LAVELANET","007|BORDIERES","008|ONDES GEGC","009|BEGLES","010|RESOLUT","011|VERFEIL TRANCHEES","012|BIZANOS","013|ST ORENS","014|BARRY","015|BARRY BT","016|FINHAN","017|LUZ ST SAUVEUR","018|BOULOGNE SUR GESSE","019|SAUCATS","020|LACABAREDE","021|CIERP","022|BARBOTAN","023|PORTET FUITE AIS","024|BASTILLAC","025|AZAS","026|BRETAGNE","027|GOURJADE","028|L'ISLE EN DODON","029|JARLARD DJ","030|LAFOURGUETTE","031|GRAMONT","032|BRETAGNE","033|VERFEIL CLOTURE","034|BOULOGNE AIS","035|RISCLE","036|MONTAUBAN","037|BALMA","038|SOULAGES","039|GODIN","040|CONDOM","041|BASCAT","042|GLF","043|BARRY PEINTURE","044|JEAN BRUHNES","045|MIRANDE","046|MONTAUBAN","047|ST ALBAN","048|GRAMONT VENTIL","049|HOSTENS","050|BESSANGES","051|JEGUN","051|VIC FEZANSAC","052|ILLE SUR TET","053|DESAUTEL GRAMONT","054|BARRY GRAVILLONNAGE","055|BALMA TR","056|CHÂTEAU DOUCHES","057|LACAUNE FUITE","058|MEDITERRANEE PALPLANCHES","059|GAILLAC CLOTURE","060|ARNAC CLOTURE","061|CENON","062|GRAMONT FAISCEAU","063|REALMONT","064|PORTET DALLE + RAMPE","065|VILLEFRANCHE PEINTURE","066|REQUISTA MPF","067|ELYE","068|CAZEDARNES","069|CONDOM EVACUATION","070|CASTELSAEEAZIN PELISSIER","071|DESAUTEL JEAN BRUHNES","072|GRAMONT PLANEITE","073|LA GLACIERE","074|ARCACHON","075|L'ISLE JOURDAIN TOITURE","076|DOUDRAC","077|BERTHOLENE PORTAIL","078|VERFEIL DALLE","079|PORTAIL LACAUN BERT","080|PERQUIE","081|PASSAGE D'AGEN RTE","082|GRAMONT PORTES","083|VERFEIL","084|GOURDAN CLOTURE","085|L'ISLE JOURDAIN EIFFAGE","086|CIERP SANITAIRES","087|ST GIRONS TELECOM","088|ARVIEU","089|ST SULPICE TRVX PREPA","090|COMBES LAVAUR EN JACCA","091|LAURAGAIS","092|SEMEZIES","093|LESPINET","094|ST SULPICE GT AZUR","095|CIERP","096|SADIRAC SDEL","097|PORTET CLOTURE","098|AUTAA CALE TR","099|VENTE RACK","100|EN JACCA BALISAGE","101|ST SULPICE GEGC","102|MAYET","103|GOURJADE CLOTURE","104|HOSTENS SDEL","105|GRAMONT AMENAGEMENTS","106|LEDAR CLOTURE","107|DALLES BLACK OUT","108|LA GLACIERE","109|PREGRAND","110|BRETAGNE D'ARMAGNAC","111|NOILHAN PORTAIL","112|CAHORS","113|CONDOM POMPE","114|REQUISTA GRILLE","115|CARBONNE","116|GORGES DE LA CERE","117|LAVAUR CLOTURE","118|AUDON","119|PLAQUES CNX AIS NMP","120|VERFEIL OMEXOM","121|GORGES DE LA CERE INEO","122|MARZENS","123|VERFEIL CLOTURE RTE","124|LANNEMEZAN","125|GOUTRENS CLOTURE","126|BARRAQUEVILLE CLOTURE","127|MIRANDE HORLOGE","128|FD TALAMET","129|BLACK OUT RODEZ","130|NERAC INEO","131|LUNAN RELAIS TELECOM","132|MARSILLON","133|PARENTIS","134|ST ORENS RTE","135|ETABLES","136|RIGNAC CLOTURE","137|RUEYRES LA PRADE BLACK OUT","138|NERAC DALLES CONDO","139|BELEM ETANCHEITE","140|LERE AMENAGEMENTS","141|LERE CLOTURE","142|PARPAIOLA CANIVEAUX","143|NERAC GEGC","144|LAGUIAN MIDOUR BLACK OUT","145|BARBOTAN DALLE","146|VENTE BRH","147|SEVERAC LE CHÂTEAU","148|LAURAS","149|MILLAU AMENAGEMENTS","150|LA VERNELLE INEO","151|LA VERNELLE ENEDIS","152|GINESTOUS MIREPOIX ST ORENS BLACK OUT","153|VOINGT","154|SOULOM","155|ST A. CUBZAC REMBLAI","156|CONSTRUCTYS FACTURATION","157|AVIGNONET","158|BERAT ETUDES","159|PREGRAND BO","160|MAZAMET ETANCHEITE","161|BORDEROUGE","162|CARBONNE PCCN","163|STOCK DALLES CNVX AMEPS","164|BEAUMONT DE LOMAGNE CNVX HTA","165|MATRAS MONTAUBAN FINHAN BO","166|MOUNEDE PLAQUES","167|MISTROU CANIVEAUX","168|DALLES CANIVEAUX AIS MPS","169|ST CHELY D'APCHER","170|GRAMONT REPRISE CLOTURE","171|AUCH DEMOL CONDOS","172|CARBONNE","173|VIC FEZENSAC TRVX PREPA","174|CENON OMEXOM ANNULE","175|FINHAN CONDOS","176|VENTE PILONNEUSE","177|VIC FEZENSAC DEGRAVILLONNAGE","178|BALMA REPRISE SOGC","179|CASTELSARRASIN BAT","180|LUZIERES AEP","181|BLACK OUT AIS 5 PST","182|CISSAC","183|MONTGROS EIFFAGE","184|JARLARD MAZAMET BALISAGE","185|LA VERNELLE GEGC","186|FOIX LEDAR BO","187|CLERMONT L'HERAULT DEMOLITION","188|MONTGROS GT AZUR","189|EN JACCA MALT","190|ESCANDOLIERES ACCES RELAIS","191|DAUX DALLES","192|AIS MASSIFS CONTAINER","193|PONT DE MENAT FOSSE","194|BO NMP","195|GAREIN CLOTURE","196|BO BELEM","197|VIC FEZENSAC","198|CASTELSARRASIN GEGC","199|LAVAUR FUITE AEP","200|VALLON","201|CONSTRUCTYS 2025","202|VILLEFRANCHE DE ROUERGUE AEP","203|BELAIR VILLEFRANCHE PLAQUES","204|MOREAU CABLE HTA","205|GRAULHET DEMOLITION","206|GOURDON CANIVEAUX","207|SEVERAC MPF","208|MARSILLON ZEROPHYTO","209|HAGETMAU INEO","210|TALAMET EIFFAGE","211|COMBES AEP","212|JALIS","213|EN JACCA AMENAGEMENTS","214|RIEUMES","215|AUDON CANIVEAU","216|CARBONNE GC","217|THIVIERS INEO","218|UNET INEO","219|VALLON RTE","220|LUZIERES OBTURATION NUISIBLES","221|LARDIT","222|SABLAGE CANIVEAUX","223|LACAUNE REPRISE PISTES","224|SEYSSES","225|THIVIERS GEGC","226|MONTGROS LOGE TR","227|FERROUGE BO","228|DALLES CNVX MPS + MONTREAL","229|UNET GEGC","230|LAFOURGUETTE TELECOM","231|LARDIT EIFFAGE BO","232|NEUSSARGUES","233|ARVIEU TR312","234|LERE FOUILLE HTA","235|NEUSSARGUES INEO","236|PREGRAND PETITS TVX","237|REQUISTA GRANDS TVX","238|MOUNEDE TELECOM","239|REVEL FOUILLE HTA","240|PARENTIS SOUTENEMENT","241|LEGUEVIN TELECOM","242|MEZIN PORTAIL","243|DOUDRAC PORTAIL","244|RIVENEUVE","245|PASSAGE D'AGEN CNVX","246|LUXEY CLOTURE","247|NESTE","248|RISCLE PT","249|RISCLE INEO","250|MURET DALLE","251|ST HENRI BO","252|ST SEVER TCFM","253|ROJA DJ","254|MASSEUBE"];
+  return {
+    bons:[],
+    affaires:aff.map((s,i)=>{const p=s.indexOf("|");return{id:"A"+i,num:s.slice(0,p),nom:s.slice(p+1),client:""}}),
+    chefs:["Anthony CABROL","Lionel ALRAM","Guillaume VANGREVELYNGHE","Morgan LANASPEZE","Samuel REINA","Eric LAGARDE","Juanito MAILLOT","David DA COSTA","Romain PRIEUR","Anthony LAGARDE","Nicolas COIG","Maxime BARTHES","Pascal PONS","David LOEC","Ludovic BARDOU","Hector GIMENEZ","Duncan GODINEAU","Christel FAUGERE","Martins Pereira VITOR MANUEL","Thomas CHAUVAN","Gabriel DESTACAMP","José CAMPOS","Thibaud MARIE","Hervé ZANARDO","Romiro DOMINGUES"],
+    fournisseurs:["Rexel","Sonepar","Tronic","Würth","Point P","Legrand","Schneider Electric"],
+    emailBureau:"conducteur@gcf-fronton.fr",
+  };
+}
+
+function loadDB() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || defaultDB(); }
+  catch { return defaultDB(); }
+}
+
+function genNum() {
+  const n = new Date(), p = v => String(v).padStart(2,"0");
+  return String(n.getFullYear()).slice(2)+p(n.getMonth()+1)+p(n.getDate())+p(n.getHours())+p(n.getMinutes());
+}
+
+function money(v) {
+  return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(v||0);
+}
+
+function today() { return new Date().toISOString().split("T")[0]; }
+
+function formatDate(d) {
+  if(!d) return "";
+  const [y,m,j] = d.split("-");
+  return `${j}/${m}/${y}`;
+}
+
+function toDataUrl(file) {
+  return new Promise((resolve,reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+const inputStyle = {
+  width:"100%", background:"#FAFAF8", border:"1.5px solid #E2DDD6",
+  borderRadius:10, color:"#1C1917", fontSize:"0.95rem", padding:"11px 13px",
+  WebkitAppearance:"none",
+};
+
+const btnBase = {
+  display:"block", width:"100%", padding:14, border:"none", borderRadius:12,
+  fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:"0.88rem",
+  letterSpacing:1, textTransform:"uppercase", cursor:"pointer", marginBottom:10,
+};
+
+function Btn({ children, primary, green, secondary, onClick, style={} }) {
+  const bg = primary?"#C8400A":green?"#1A3A2A":"#fff";
+  const color = primary||green?"white":"#1C1917";
+  const border = secondary?"1.5px solid #E2DDD6":"none";
+  return <button onClick={onClick} style={{...btnBase,background:bg,color,border,...style}}>{children}</button>;
+}
+
+function SectionTitle({ children }) {
+  return (
+    <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.62rem",letterSpacing:2,textTransform:"uppercase",color:"#78716C",margin:"18px 0 10px",display:"flex",alignItems:"center",gap:8}}>
+      {children}
+      <div style={{flex:1,height:1,background:"#E2DDD6"}}/>
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div style={{marginBottom:12}}>
+      <label style={{display:"block",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.6rem",letterSpacing:"1.5px",textTransform:"uppercase",color:"#78716C",marginBottom:5}}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function BonCard({ bon, db, onDelete, onViewPhotos }) {
+  const aff = db.affaires.find(a => a.id === bon.affaireId);
+  return (
+    <div style={{background:"#fff",border:"1px solid #E2DDD6",borderRadius:14,padding:"13px 13px 13px 17px",marginBottom:10,boxShadow:"0 2px 12px rgba(28,25,23,0.08)",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",left:0,top:0,bottom:0,width:4,background:bon.sent?"#15803D":"#C8400A",borderRadius:"4px 0 0 4px"}}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+        <span style={{fontFamily:"'DM Mono',monospace",fontSize:"0.76rem",color:"#C8400A",background:"#F5E8E2",padding:"3px 8px",borderRadius:6}}>{bon.numero}</span>
+        <span style={{fontFamily:"'Syne',sans-serif",fontSize:"0.58rem",fontWeight:700,letterSpacing:1,textTransform:"uppercase",padding:"3px 8px",borderRadius:6,background:bon.sent?"#DCFCE7":"#FEF3C7",color:bon.sent?"#15803D":"#92400E"}}>
+          {bon.sent?"Envoyé":"À envoyer"}
+        </span>
+      </div>
+      <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.95rem",marginBottom:4}}>{bon.fournisseur}</div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:8}}>
+        {[`📅 ${formatDate(bon.date)}`, aff&&`🏗️ ${aff.num}`, `👷 ${bon.chef||"—"}`, bon.prixEstime&&`💶 ${money(bon.prixEstime)}`].filter(Boolean).map((m,i)=>(
+          <span key={i} style={{fontSize:"0.7rem",color:"#78716C"}}>{m}</span>
+        ))}
+      </div>
+      {bon.detail && <div style={{fontSize:"0.7rem",color:"#78716C",marginBottom:8,lineHeight:1.4}}>{bon.detail}</div>}
+      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+        {bon.photosBL?.length>0 && (
+          <button onClick={()=>onViewPhotos(bon)} style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 11px",borderRadius:7,border:"none",background:"#F5E8E2",color:"#C8400A",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.6rem",letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}}>
+            📷 {bon.photosBL.length} photo{bon.photosBL.length>1?"s":""}
+          </button>
+        )}
+        {!bon.sent && (
+          <button onClick={()=>onDelete(bon.id)} style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 11px",borderRadius:7,border:"1px solid #E2DDD6",background:"#FAFAF8",color:"#78716C",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.6rem",letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}}>
+            🗑️ Supprimer
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [db, setDB] = useState(loadDB);
+  const [tab, setTab] = useState("nouveau");
+
+  // Draft
+  const [numero, setNumero] = useState(null);
+  const [photosBL, setPhotosBL] = useState([]);
+  const [formDate, setFormDate] = useState(today());
+  const [formAffaire, setFormAffaire] = useState("");
+  const [formChef, setFormChef] = useState("");
+  const [formFournisseur, setFormFournisseur] = useState("");
+  const [formPrix, setFormPrix] = useState("");
+  const [formDetail, setFormDetail] = useState("");
+
+  // UI
+  const [toast, setToast] = useState(null);
+  const [fullscreen, setFullscreen] = useState(null);
+  const [viewBon, setViewBon] = useState(null); // modale photos bon enregistré
+  const galerieRef = useRef(null);
+  const cameraRef = useRef(null);
+  const toastTimer = useRef(null);
+
+  // Config
+  const [newAffNum, setNewAffNum] = useState("");
+  const [newAffNom, setNewAffNom] = useState("");
+  const [newAffClient, setNewAffClient] = useState("Enedis");
+  const [newChef, setNewChef] = useState("");
+  const [newFour, setNewFour] = useState("");
+
+  useEffect(() => { localStorage.setItem(STORE, JSON.stringify(db)); }, [db]);
+
+  function showToast(msg, type="") {
+    setToast({msg,type});
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(()=>setToast(null), 2800);
+  }
+
+  const handlePhoto = useCallback(async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await toDataUrl(file);
+      setPhotosBL(prev => [...prev, dataUrl]);
+    } catch(err) {
+      console.error("Erreur lecture photo:", err);
+    }
+    e.target.value = "";
+  }, []);
+
+  function removePhoto(i) {
+    setPhotosBL(prev => prev.filter((_,idx) => idx!==i));
+    setFullscreen(null);
+  }
+
+  function enregistrer() {
+    if (!numero)         { showToast("⚠️ Générez le numéro de bon","warn"); return; }
+    if (!formDate)       { showToast("⚠️ Date obligatoire","warn"); return; }
+    if (!formAffaire)    { showToast("⚠️ Sélectionnez une affaire","warn"); return; }
+    if (!formChef)       { showToast("⚠️ Sélectionnez un chef","warn"); return; }
+    if (!formFournisseur){ showToast("⚠️ Sélectionnez un fournisseur","warn"); return; }
+
+    const aff = db.affaires.find(a=>`${a.num} – ${a.nom}`===formAffaire||a.id===formAffaire);
+    const affLabel = aff ? `${aff.num} – ${aff.nom}` : formAffaire;
+    const bon = {
+      id:"B"+Date.now(), numero, date:formDate,
+      affaireId: aff?aff.id:formAffaire, affaireLabel:affLabel,
+      chef:formChef, fournisseur:formFournisseur,
+      prixEstime:parseFloat(formPrix)||0, detail:formDetail,
+      photosBL:[...photosBL], createdAt:new Date().toISOString(),
+    };
+
+    const subject = encodeURIComponent(`[GCF] Bon ${bon.numero} – ${bon.fournisseur}`);
+    const body = encodeURIComponent(`Bonjour,
+
+Nouveau bon de commande.
+
+N° Bon       : ${bon.numero}
+Date         : ${formatDate(bon.date)}
+Affaire      : ${affLabel}
+Chef         : ${bon.chef}
+Fournisseur  : ${bon.fournisseur}
+Prix estimé  : ${bon.prixEstime?money(bon.prixEstime):"NC"}
+Détail       : ${bon.detail||"—"}
+Nom PDF      : ${bon.numero}-${bon.fournisseur.replace(/\s/g,"-")}.pdf
+
+Cordialement,
+Génie Civil Frontonnais`);
+
+    // 1. Email EN PREMIER
+    window.location.href = `mailto:${db.emailBureau}?subject=${subject}&body=${body}`;
+
+    // 2. Reset
+    setNumero(null); setPhotosBL([]); setFormDate(today());
+    setFormAffaire(""); setFormChef(""); setFormFournisseur(""); setFormPrix(""); setFormDetail("");
+
+    // 3. PDF + Sheets en arrière-plan
+    setTimeout(async()=>{
+      if(bon.photosBL.length>0){
+        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+        await genPDF(bon,db);
+      }
+      fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({numero:bon.numero,date:bon.date,affaire:affLabel,chef:bon.chef,
+          fournisseur:bon.fournisseur,prix:bon.prixEstime,detail:bon.detail,
+          dateEnvoi:new Date().toLocaleString("fr-FR")})}).catch(()=>{});
+    },800);
+  }
+
+  function effacer() {
+    if (!window.confirm("Effacer le brouillon ?")) return;
+    setNumero(null); setPhotosBL([]); setFormDate(today());
+    setFormAffaire(""); setFormChef(""); setFormFournisseur("");
+    setFormPrix(""); setFormDetail("");
+  }
+
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuXBYBJooMwE0Xw3cJUE0wSPRUXg8gIj3jZ_7ShB_rY2E61FGk1ezEaHJICcObZReJbQ/exec";
+
+  async function envoyerVersSheets(bons) {
+    for (const b of bons) {
+      const aff = db.affaires.find(a => a.id === b.affaireId);
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            numero: b.numero, date: b.date,
+            affaire: aff ? `${aff.num} – ${aff.nom}` : "",
+            chef: b.chef, fournisseur: b.fournisseur,
+            prix: b.prixEstime, detail: b.detail,
+            dateEnvoi: new Date().toLocaleString("fr-FR"),
+          }),
+        });
+      } catch(e) {}
+    }
+  }
+
+  async function telecharger() {
+    const unsent = db.bons.filter(b=>!b.sent);
+    if (!unsent.length) { showToast("Aucun bon à envoyer","warn"); return; }
+    showToast("⏳ Génération des PDF…");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    for (const b of unsent) {
+      if (b.photosBL?.length) { await genPDF(b,db); await sleep(300); }
+    }
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    genExcel(unsent,db);
+    showToast("✅ PDF + Excel téléchargés !","ok");
+  }
+
+  function ouvrirEmail() {
+    const unsent = db.bons.filter(b=>!b.sent);
+    if (!unsent.length) { showToast("Aucun bon à envoyer","warn"); return; }
+    const affLabel = id => { const a=db.affaires.find(x=>x.id===id); return a?`${a.num} – ${a.nom}`:"—"; };
+    const lignes = unsent.map(b=>`• ${b.numero} | ${b.fournisseur} | ${affLabel(b.affaireId)} | ${b.chef} | ${b.prixEstime?money(b.prixEstime):"NC"}`).join("\n");
+    const totalEst = unsent.reduce((s,b)=>s+(b.prixEstime||0),0);
+    const subject = encodeURIComponent(`[GCF] Bons de commande – ${unsent.length} bon${unsent.length>1?"s":""} – ${new Date().toLocaleDateString("fr-FR")}`);
+    const body = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint les bons de commande de la semaine.\n\nRÉCAPITULATIF (${unsent.length} bon${unsent.length>1?"s":""})\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${lignes}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nTotal estimé HT : ${money(totalEst)}\n\nCordialement,\nGénie Civil Frontonnais`);
+    window.location.href = `mailto:${db.emailBureau}?subject=${subject}&body=${body}`;
+  }
+
+  async function confirmerEnvoi() {
+    const unsent = db.bons.filter(b=>!b.sent);
+    if (!unsent.length) return;
+    setDB(prev=>({...prev, bons:prev.bons.map(b=>({...b,sent:true}))}));
+    showToast("✅ Bons marqués comme envoyés","ok");
+    // Tentative sync Google Sheets en arrière-plan (ne bloque pas si échoue)
+    envoyerVersSheets(unsent).catch(()=>{});
+  }
+
+  function supprimerBon(id) {
+    if (!window.confirm("Supprimer ce bon ?")) return;
+    setDB(prev=>({...prev, bons:prev.bons.filter(b=>b.id!==id)}));
+  }
+
+  function addAffaire() {
+    if (!newAffNum||!newAffNom) { showToast("⚠️ Numéro et intitulé obligatoires","warn"); return; }
+    setDB(prev=>({...prev, affaires:[...prev.affaires,{id:"A"+Date.now(),num:newAffNum,nom:newAffNom,client:newAffClient}]}));
+    setNewAffNum(""); setNewAffNom(""); showToast("✅ Affaire ajoutée","ok");
+  }
+  function delAffaire(i) { setDB(prev=>({...prev,affaires:prev.affaires.filter((_,idx)=>idx!==i)})); }
+  function addChef() { if(!newChef)return; setDB(prev=>({...prev,chefs:[...prev.chefs,newChef]})); setNewChef(""); showToast("👷 Chef ajouté","ok"); }
+  function delChef(i) { setDB(prev=>({...prev,chefs:prev.chefs.filter((_,idx)=>idx!==i)})); }
+  function addFour() { if(!newFour)return; setDB(prev=>({...prev,fournisseurs:[...prev.fournisseurs,newFour]})); setNewFour(""); showToast("🏭 Fournisseur ajouté","ok"); }
+  function delFour(i) { setDB(prev=>({...prev,fournisseurs:prev.fournisseurs.filter((_,idx)=>idx!==i)})); }
+  function clearAll() { if(!window.confirm("Effacer TOUTES les données ?"))return; setDB(prev=>({...prev,bons:[]})); showToast("🗑️ Données effacées"); }
+
+  const unsent = db.bons.filter(b=>!b.sent);
+  const sent = db.bons.filter(b=>b.sent).reverse();
+  const totalUnsent = unsent.reduce((s,b)=>s+(b.prixEstime||0),0);
+
+  return (
+    <div style={{background:"#F5F2ED",minHeight:"100vh",fontFamily:"'DM Sans',sans-serif",color:"#1C1917"}}>
+
+      {/* TOPBAR */}
+      <div style={{background:"#1A3A2A",padding:"14px 16px 12px",position:"sticky",top:0,zIndex:100}}>
+        <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.2rem",color:"#fff"}}>
+          GCF <span style={{color:"#F5A623"}}>·</span> Bons
+        </div>
+        <div style={{fontSize:"0.58rem",color:"rgba(255,255,255,0.45)",letterSpacing:2,textTransform:"uppercase"}}>
+          Génie Civil Frontonnais
+        </div>
+      </div>
+
+      {/* TABS */}
+      <div style={{background:"#fff",borderBottom:"1px solid #E2DDD6",display:"flex",position:"sticky",top:57,zIndex:99,boxShadow:"0 2px 12px rgba(28,25,23,0.08)"}}>
+        {[
+          {id:"nouveau",icon:"✏️",label:"Nouveau bon"},
+          {id:"config",icon:"⚙️",label:"Réglages"},
+        ].map(t=>(
+          <div key={t.id} onClick={()=>setTab(t.id)} style={{
+            flex:1,padding:"12px 4px 10px",textAlign:"center",
+            fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.62rem",
+            letterSpacing:1,textTransform:"uppercase",cursor:"pointer",
+            color:tab===t.id?"#C8400A":"#78716C",
+            borderBottom:tab===t.id?"3px solid #C8400A":"3px solid transparent",
+            transition:"all 0.2s",position:"relative",
+          }}>
+            <div style={{fontSize:"1.1rem",marginBottom:2}}>{t.icon}</div>
+            {t.label}
+            {t.badge>0&&(
+              <span style={{position:"absolute",top:7,right:"calc(50% - 18px)",background:"#C8400A",color:"white",borderRadius:10,padding:"1px 5px",fontSize:"0.55rem",fontWeight:700}}>
+                {t.badge}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* PAGES */}
+      <div style={{padding:"14px 14px 90px"}}>
+
+        {/* NOUVEAU BON */}
+        {tab==="nouveau" && (
+          <div>
+            {!numero ? (
+              <div style={{background:"#F5E8E2",border:"2px dashed #C8400A",borderRadius:16,padding:"40px 20px",textAlign:"center",marginTop:8}}>
+                <div style={{fontSize:"3rem",marginBottom:12}}>🧾</div>
+                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1rem",marginBottom:8}}>Nouveau bon de commande</div>
+                <div style={{fontSize:"0.78rem",color:"#78716C",marginBottom:24,lineHeight:1.6}}>
+                  Appuyez pour générer le numéro horodaté.<br/>Ce numéro identifiera ce bon de façon unique.
+                </div>
+                <button onClick={()=>setNumero(genNum())} style={{...btnBase,background:"#C8400A",color:"white",width:"auto",padding:"14px 36px",margin:"0 auto"}}>
+                  🧾 Générer le numéro
+                </button>
+              </div>
+            ) : (
+              <div>
+                {/* Numéro */}
+                <div style={{background:"#1A3A2A",borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+                  <div>
+                    <div style={{fontSize:"0.6rem",color:"rgba(255,255,255,0.5)",letterSpacing:1,textTransform:"uppercase",marginBottom:2}}>N° de bon</div>
+                    <div style={{fontFamily:"'DM Mono',monospace",fontSize:"1.2rem",color:"#F5A623",letterSpacing:1}}>{numero}</div>
+                  </div>
+                  <button onClick={()=>{if(window.confirm("Regénérer ?"))setNumero(genNum());}}
+                    style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:7,color:"rgba(255,255,255,0.65)",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.62rem",padding:"7px 11px",cursor:"pointer",letterSpacing:1}}>
+                    ↺ Regénérer
+                  </button>
+                </div>
+
+                {/* Photos BL */}
+                <SectionTitle>Photos du BL</SectionTitle>
+                <div style={{background:"#fff",border:"1.5px solid #E2DDD6",borderRadius:14,padding:12,marginBottom:12}}>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:8}}>
+                    {photosBL.map((p,i)=>(
+                      <div key={i} onClick={()=>setFullscreen({src:p,index:i})}
+                        style={{position:"relative",width:82,height:82,borderRadius:9,overflow:"hidden",flexShrink:0,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
+                        <img src={p} alt={`BL ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        <button onClick={e=>{e.stopPropagation();removePhoto(i);}}
+                          style={{position:"absolute",top:3,right:3,background:"rgba(0,0,0,0.6)",color:"white",border:"none",borderRadius:"50%",width:20,height:20,fontSize:"0.6rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                        <div style={{position:"absolute",bottom:3,left:4,background:"rgba(0,0,0,0.55)",color:"white",fontSize:"0.58rem",fontWeight:700,borderRadius:4,padding:"1px 5px"}}>{i+1}</div>
+                      </div>
+                    ))}
+                    <div onClick={()=>galerieRef.current?.click()}
+                      style={{width:82,height:82,borderRadius:9,border:"2px dashed #E2DDD6",background:"#FAFAF8",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
+                      <div style={{fontSize:"1.4rem",opacity:0.4}}>🖼️</div>
+                      <div style={{fontSize:"0.58rem",color:"#78716C",fontWeight:600,textAlign:"center"}}>Galerie</div>
+                    </div>
+                    <div onClick={()=>cameraRef.current?.click()}
+                      style={{width:82,height:82,borderRadius:9,border:"2px dashed #E2DDD6",background:"#FAFAF8",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
+                      <div style={{fontSize:"1.4rem",opacity:0.4}}>📷</div>
+                      <div style={{fontSize:"0.58rem",color:"#78716C",fontWeight:600,textAlign:"center"}}>Photo</div>
+                    </div>
+                  </div>
+                  <div style={{fontSize:"0.68rem",color:"#78716C"}}>
+                    {photosBL.length===0?"📎 Aucune photo — ajoutez les pages du BL":`✅ ${photosBL.length} page${photosBL.length>1?"s":""} · Appuyez sur une vignette pour agrandir`}
+                  </div>
+                </div>
+                <input ref={galerieRef} type="file" accept="image/*" style={{display:"none"}} onChange={handlePhoto} onClick={e=>e.stopPropagation()}/>
+                <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={handlePhoto} onClick={e=>e.stopPropagation()}/>
+
+                {/* Formulaire */}
+                <SectionTitle>Informations</SectionTitle>
+                <Field label="📅 Date"><input type="date" value={formDate} onChange={e=>setFormDate(e.target.value)} style={inputStyle}/></Field>
+                <Field label="🏗️ Affaire / Chantier">
+                  <input list="aff-list" value={formAffaire} onChange={e=>setFormAffaire(e.target.value)} placeholder="Tapez ou choisissez…" style={inputStyle}/>
+                  <datalist id="aff-list">{db.affaires.map(a=><option key={a.id} value={`${a.num} – ${a.nom}`}/>)}</datalist>
+                </Field>
+                <Field label="👷 Chef de chantier">
+                  <input list="chef-list" value={formChef} onChange={e=>setFormChef(e.target.value)} placeholder="Tapez ou choisissez…" style={inputStyle}/>
+                  <datalist id="chef-list">{db.chefs.map(c=><option key={c} value={c}/>)}</datalist>
+                </Field>
+                <Field label="🏭 Fournisseur">
+                  <select value={formFournisseur} onChange={e=>setFormFournisseur(e.target.value)} style={inputStyle}>
+                    <option value="">Sélectionner…</option>
+                    {db.fournisseurs.map(f=><option key={f} value={f}>{f}</option>)}
+                  </select>
+                </Field>
+                <Field label="💶 Prix estimé HT (€)"><input type="number" placeholder="0.00" step="0.01" min="0" value={formPrix} onChange={e=>setFormPrix(e.target.value)} style={inputStyle}/></Field>
+                <Field label="📝 Détail fournitures"><textarea rows={3} placeholder="Câble HTA, armoires, visserie…" value={formDetail} onChange={e=>setFormDetail(e.target.value)} style={{...inputStyle,resize:"none"}}/></Field>
+
+                <hr style={{border:"none",borderTop:"1px solid #E2DDD6",margin:"16px 0"}}/>
+                <button onClick={enregistrer} style={{...btnBase,background:"#C8400A",color:"white"}}>📤 Envoyer le bon par email</button>
+                <Btn secondary onClick={effacer}>🗑️ Effacer</Btn>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* MA SEMAINE */}
+        {tab==="semaine" && (
+          <div>
+            <div style={{background:"#1A3A2A",borderRadius:14,padding:16,marginBottom:16}}>
+              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"0.9rem",color:"#F5A623",marginBottom:4}}>📬 Envoi hebdomadaire</div>
+              <div style={{fontSize:"0.74rem",color:"rgba(255,255,255,0.55)",marginBottom:14}}>Bons en attente d'envoi au conducteur de travaux</div>
+              <div style={{display:"flex",gap:10,marginBottom:14}}>
+                {[{v:unsent.length,l:"Bons prêts"},{v:money(totalUnsent),l:"Estimé HT"}].map((s,i)=>(
+                  <div key={i} style={{flex:1,background:"rgba(255,255,255,0.08)",borderRadius:8,padding:"9px 10px",textAlign:"center"}}>
+                    <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.3rem",color:"white"}}>{s.v}</div>
+                    <div style={{fontSize:"0.57rem",color:"rgba(255,255,255,0.45)",letterSpacing:1,textTransform:"uppercase",marginTop:2}}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+              {unsent.length>0 ? (
+                <div>
+                  <button onClick={telecharger} style={{...btnBase,background:"#fff",color:"#1C1917",border:"1.5px solid #E2DDD6",marginBottom:8}}>📥 1. Télécharger PDF + Excel</button>
+                  <button onClick={ouvrirEmail} style={{...btnBase,background:"#C8400A",color:"white",marginBottom:8}}>📧 2. Ouvrir l'email</button>
+                  <button onClick={confirmerEnvoi} style={{...btnBase,background:"#FEF3C7",color:"#92400E",border:"1.5px solid #fcd34d",marginBottom:0}}>✅ 3. Confirmer l'envoi</button>
+                </div>
+              ) : (
+                <div style={{textAlign:"center",color:"rgba(255,255,255,0.4)",fontSize:"0.8rem"}}>Tous les bons ont été envoyés ✓</div>
+              )}
+            </div>
+
+            {unsent.length>0 && <>
+              <SectionTitle>À envoyer ({unsent.length})</SectionTitle>
+              {unsent.map(b=><BonCard key={b.id} bon={b} db={db} onDelete={supprimerBon} onViewPhotos={setViewBon}/>)}
+            </>}
+            {sent.length>0 && <>
+              <SectionTitle>Déjà envoyés</SectionTitle>
+              {sent.map(b=><BonCard key={b.id} bon={b} db={db} onDelete={supprimerBon} onViewPhotos={setViewBon}/>)}
+            </>}
+            {db.bons.length===0 && (
+              <div style={{textAlign:"center",padding:"44px 20px",color:"#78716C"}}>
+                <div style={{fontSize:"2.4rem",opacity:0.3,marginBottom:10}}>📭</div>
+                <div style={{fontSize:"0.8rem",opacity:0.6}}>Aucun bon cette semaine</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* CONFIG */}
+        {tab==="config" && (
+          <div>
+            <SectionTitle>Email bureau</SectionTitle>
+            <Field label="📧 Adresse conducteur de travaux">
+              <input type="email" value={db.emailBureau} onChange={e=>setDB(prev=>({...prev,emailBureau:e.target.value}))} style={inputStyle}/>
+            </Field>
+
+            <SectionTitle>Affaires en cours</SectionTitle>
+            {db.affaires.map((a,i)=>(
+              <div key={a.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                <span style={{fontFamily:"'DM Mono',monospace",fontSize:"0.78rem",color:"#C8400A",background:"#F5E8E2",padding:"3px 8px",borderRadius:6,whiteSpace:"nowrap"}}>{a.num}</span>
+                <div style={{flex:1,fontSize:"0.85rem"}}>{a.nom} <span style={{color:"#78716C",fontSize:"0.72rem"}}>{a.client}</span></div>
+                <button onClick={()=>delAffaire(i)} style={{background:"none",border:"none",color:"#78716C",cursor:"pointer",fontSize:"1rem"}}>✕</button>
+              </div>
+            ))}
+            <div style={{display:"flex",gap:6,marginBottom:6}}>
+              <input value={newAffNum} onChange={e=>setNewAffNum(e.target.value)} placeholder="2025-044" style={{...inputStyle,flex:"0.9"}}/>
+              <input value={newAffNom} onChange={e=>setNewAffNom(e.target.value)} placeholder="Intitulé chantier" style={{...inputStyle,flex:2}}/>
+            </div>
+            <div style={{display:"flex",gap:6,marginBottom:14}}>
+              <select value={newAffClient} onChange={e=>setNewAffClient(e.target.value)} style={{...inputStyle,flex:1}}>
+                <option>Enedis</option><option>RTE</option><option>Autre</option>
+              </select>
+              <button onClick={addAffaire} style={{background:"#C8400A",color:"white",border:"none",borderRadius:10,padding:"9px 16px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.75rem",cursor:"pointer",whiteSpace:"nowrap"}}>+ Ajouter</button>
+            </div>
+
+            <SectionTitle>Chefs de chantier</SectionTitle>
+            {db.chefs.map((c,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                <div style={{flex:1,fontSize:"0.88rem"}}>{c}</div>
+                <button onClick={()=>delChef(i)} style={{background:"none",border:"none",color:"#78716C",cursor:"pointer"}}>✕</button>
+              </div>
+            ))}
+            <div style={{display:"flex",gap:6,marginBottom:14}}>
+              <input value={newChef} onChange={e=>setNewChef(e.target.value)} placeholder="Prénom Nom" style={{...inputStyle,flex:1}}/>
+              <button onClick={addChef} style={{background:"#1A3A2A",color:"white",border:"none",borderRadius:10,padding:"9px 16px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.75rem",cursor:"pointer"}}>+ Ajouter</button>
+            </div>
+
+            <SectionTitle>Fournisseurs</SectionTitle>
+            {db.fournisseurs.map((f,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                <div style={{flex:1,fontSize:"0.88rem"}}>{f}</div>
+                <button onClick={()=>delFour(i)} style={{background:"none",border:"none",color:"#78716C",cursor:"pointer"}}>✕</button>
+              </div>
+            ))}
+            <div style={{display:"flex",gap:6,marginBottom:14}}>
+              <input value={newFour} onChange={e=>setNewFour(e.target.value)} placeholder="Nom fournisseur" style={{...inputStyle,flex:1}}/>
+              <button onClick={addFour} style={{background:"#1A3A2A",color:"white",border:"none",borderRadius:10,padding:"9px 16px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.75rem",cursor:"pointer"}}>+ Ajouter</button>
+            </div>
+
+            <hr style={{border:"none",borderTop:"1px solid #E2DDD6",margin:"16px 0"}}/>
+            <button onClick={clearAll} style={{...btnBase,background:"#fee2e2",color:"#991b1b"}}>🗑️ Effacer toutes les données</button>
+          </div>
+        )}
+      </div>
+
+      {/* PHOTO PLEIN ÉCRAN */}
+      {fullscreen && (
+        <div onClick={()=>setFullscreen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.96)",zIndex:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:16}}>
+          <div onClick={e=>e.stopPropagation()} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",marginBottom:12}}>
+            <span style={{color:"rgba(255,255,255,0.7)",fontFamily:"'Syne',sans-serif",fontSize:"0.78rem",fontWeight:700}}>
+              Page {fullscreen.index+1} / {photosBL.length}
+            </span>
+            <button onClick={()=>setFullscreen(null)} style={{background:"rgba(255,255,255,0.12)",border:"none",color:"white",borderRadius:8,padding:"8px 14px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.75rem",cursor:"pointer"}}>✕ Fermer</button>
+          </div>
+          <img src={fullscreen.src} alt="BL" onClick={e=>e.stopPropagation()} style={{maxWidth:"100%",maxHeight:"70vh",objectFit:"contain",borderRadius:8}}/>
+          <button onClick={e=>{e.stopPropagation();removePhoto(fullscreen.index);}}
+            style={{marginTop:16,background:"rgba(200,64,10,0.8)",border:"none",color:"white",borderRadius:10,padding:"10px 24px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.78rem",cursor:"pointer"}}>
+            🗑️ Supprimer cette photo
+          </button>
+        </div>
+      )}
+
+      {/* MODALE PHOTOS BON ENREGISTRÉ */}
+      {viewBon && (
+        <div onClick={()=>setViewBon(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.96)",zIndex:300,overflowY:"auto",padding:16}}>
+          <div onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <div>
+                <div style={{color:"#F5A623",fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"0.9rem"}}>{viewBon.numero}</div>
+                <div style={{color:"rgba(255,255,255,0.6)",fontSize:"0.75rem"}}>{viewBon.fournisseur} · {viewBon.photosBL.length} page{viewBon.photosBL.length>1?"s":""}</div>
+              </div>
+              <button onClick={()=>setViewBon(null)} style={{background:"rgba(255,255,255,0.12)",border:"none",color:"white",borderRadius:8,padding:"8px 14px",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.75rem",cursor:"pointer"}}>✕ Fermer</button>
+            </div>
+            {viewBon.photosBL.map((p,i)=>(
+              <div key={i} style={{marginBottom:16}}>
+                <div style={{color:"#888",fontSize:"0.72rem",marginBottom:6}}>Page {i+1}</div>
+                <img src={p} alt={`Page ${i+1}`} style={{width:"100%",borderRadius:8,display:"block"}}/>
+              </div>
+            ))}
+            <button onClick={()=>setViewBon(null)} style={{...btnBase,background:"rgba(255,255,255,0.1)",color:"white",marginTop:8}}>Fermer</button>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      {toast && (
+        <div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",background:toast.type==="ok"?"#15803D":toast.type==="warn"?"#92400E":"#1A3A2A",color:"white",fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"0.8rem",padding:"11px 20px",borderRadius:50,zIndex:999,whiteSpace:"nowrap",boxShadow:"0 8px 32px rgba(28,25,23,0.12)"}}>
+          {toast.msg}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+function loadScript(src) {
+  return new Promise(resolve => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+async function genPDF(bon, db) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+  const aff = db.affaires.find(a=>a.id===bon.affaireId);
+  doc.setFillColor(26,58,42); doc.rect(0,0,210,26,"F");
+  doc.setTextColor(245,166,35); doc.setFontSize(15); doc.setFont("helvetica","bold");
+  doc.text("GCF – Génie Civil Frontonnais",14,11);
+  doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont("helvetica","normal");
+  doc.text(`Bon de livraison  N° ${bon.numero}`,14,20);
+  const rows=[["Date",formatDate(bon.date)],["Affaire",aff?`${aff.num} – ${aff.nom}`:"—"],["Client",aff?.client||"—"],["Chef",bon.chef||"—"],["Fournisseur",bon.fournisseur],["Prix estimé HT",bon.prixEstime?money(bon.prixEstime):"NC"],["Fournitures",bon.detail||"—"]];
+  let y=36;
+  rows.forEach(([k,v])=>{
+    doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(120,113,108);
+    doc.text(k,14,y);
+    doc.setFont("helvetica","normal"); doc.setTextColor(28,25,23);
+    const lines=doc.splitTextToSize(String(v),120);
+    doc.text(lines,62,y);
+    y+=lines.length>1?lines.length*5+2:7;
+  });
+  if (bon.photosBL?.length) {
+    for (let i=0;i<bon.photosBL.length;i++) {
+      doc.addPage();
+      doc.setFillColor(26,58,42); doc.rect(0,0,210,16,"F");
+      doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont("helvetica","bold");
+      doc.text(`BL page ${i+1}/${bon.photosBL.length}  –  ${bon.numero}  –  ${bon.fournisseur}`,14,11);
+      try {
+        const img=bon.photosBL[i];
+        const props=doc.getImageProperties(img);
+        const maxW=182,maxH=250;
+        let w=maxW,h=(props.height*maxW)/props.width;
+        if(h>maxH){h=maxH;w=(props.width*maxH)/props.height;}
+        doc.addImage(img,"JPEG",(210-w)/2,22,w,h);
+      } catch(e){doc.text("Image non disponible",14,30);}
+    }
+  }
+  doc.save(`${bon.numero}-${bon.fournisseur.replace(/[\s/\\]/g,"-")}.pdf`);
+}
+
+function genExcel(bons, db) {
+  const XLSX = window.XLSX;
+  const rows = bons.map(b=>{
+    const aff=db.affaires.find(a=>a.id===b.affaireId);
+    return {"N° Bon":b.numero,"Date":b.date,"N° Affaire":aff?.num||"","Chantier":aff?.nom||"","Client":aff?.client||"","Chef":b.chef||"","Fournisseur":b.fournisseur||"","Détail":b.detail||"","Prix estimé HT (€)":b.prixEstime||"","Prix réel facturé HT (€)":"","N° Facture":"","Nom PDF":`${b.numero}-${b.fournisseur?.replace(/\s/g,"-")}.pdf`};
+  });
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[14,12,12,28,10,20,18,36,14,16,14,32].map(w=>({wch:w}));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Bons");
+  XLSX.writeFile(wb,`GCF_Bons_${new Date().toISOString().split("T")[0]}.xlsx`);
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
